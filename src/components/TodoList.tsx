@@ -3,7 +3,7 @@ import { Button, Input, Flex, Checkbox, Heading } from '@chakra-ui/react';
 
 import { useStore } from 'effector-react';
 
-import $store, { setNewTodo, addTodo } from '../store';
+import $store, { toggle, remove, update } from '../store';
 
 function TodoListItems() {
   const store = useStore($store);
@@ -12,9 +12,15 @@ function TodoListItems() {
     <>
       {store.todos.map((todo) => (
         <Flex pt={2} key={todo.id}>
-          <Checkbox />
-          <Input mx={2} value={todo.text} />
-          <Button>Delete</Button>
+          <Checkbox checked={todo.done} onClick={() => toggle(todo.id)} />
+          <Input
+            mx={2}
+            value={todo.text}
+            onChange={(event) =>
+              update({ id: todo.id, text: event.target.value })
+            }
+          />
+          <Button onClick={() => remove(todo.id)}>Delete</Button>
         </Flex>
       ))}
     </>
