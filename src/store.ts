@@ -1,4 +1,5 @@
 import { createEvent, createStore } from 'effector';
+import { idText } from 'typescript';
 
 export interface Todo {
   id: number;
@@ -39,6 +40,9 @@ type Store = {
 
 export const setNewTodo = createEvent<string>();
 export const addTodo = createEvent();
+export const update = createEvent<{ id: number; text: string }>();
+export const toggle = createEvent<number>();
+export const remove = createEvent<number>();
 
 export default createStore<Store>({
   todos: [],
@@ -49,6 +53,19 @@ export default createStore<Store>({
     newTodo,
   }))
   .on(addTodo, (state, newTodo) => ({
-    newTodo: '',
+    ...state,
     todos: addTodoList(state.todos, state.newTodo),
+  }))
+  .on(update, (state, { id, text }) => ({
+    ...state,
+    todos: updateTodo(state.todos, id, text),
+  }))
+  .on(toggle, (state, id) => ({
+    ...state,
+    newTodo: '',
+    todos: toggleTodo(state.todos, id),
+  }))
+  .on(remove, (state, id) => ({
+    ...state,
+    todos: removeTodo(state.todos, id),
   }));
