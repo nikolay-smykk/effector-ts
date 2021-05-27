@@ -1,4 +1,5 @@
-// Standard interface and functions
+import { createEvent, createStore } from 'effector';
+
 export interface Todo {
   id: number;
   text: string;
@@ -20,11 +21,34 @@ export const toggleTodo = (todos: Todo[], id: number): Todo[] =>
 export const removeTodo = (todos: Todo[], id: number): Todo[] =>
   todos.filter((todo) => todo.id !== id);
 
-export const addTodo = (todos: Todo[], text: string): Todo[] => [
+export const addTodoList = (todos: Todo[], text: string): Todo[] => [
   ...todos,
+
   {
     id: Math.max(0, Math.max(...todos.map(({ id }) => id))) + 1,
     text,
     done: false,
   },
 ];
+
+//effector state
+type Store = {
+  todos: Todo[];
+  newTodo: string;
+};
+
+export const setNewTodo = createEvent<string>();
+export const addTodo = createEvent();
+
+export default createStore<Store>({
+  todos: [],
+  newTodo: '',
+})
+  .on(setNewTodo, (state, newTodo) => ({
+    ...state,
+    newTodo,
+  }))
+  .on(addTodo, (state, newTodo) => ({
+    newTodo: '',
+    todos: addTodoList(state.todos, state.newTodo),
+  }));
